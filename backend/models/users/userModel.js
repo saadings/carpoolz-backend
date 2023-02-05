@@ -22,10 +22,20 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    minlength: 8,
+    maxlength: 32,
   },
   contactNumber: {
     type: String,
     required: true,
+    minlength: 11,
+    maxlength: 14,
+    validate: {
+      validator: function (value) {
+        return /^\d+$/.test(value);
+      },
+      message: "{VALUE} is not a valid contact number!",
+    },
   },
   gender: {
     type: String,
