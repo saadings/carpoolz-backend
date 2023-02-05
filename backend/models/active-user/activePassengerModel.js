@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
 
 const ActivePassengerSchema = new mongoose.Schema({
-  UID: {
+  userID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "",
+    ref: "User",
     required: true,
   },
   longitude: {
-    type: Number,
+    type: mongoose.Types.Decimal128,
     required: true,
   },
   latitude: {
-    type: Number,
+    type: mongoose.Types.Decimal128,
     required: true,
   },
 });

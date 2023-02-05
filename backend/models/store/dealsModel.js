@@ -10,12 +10,12 @@ const DealsSchema = new mongoose.Schema({
     required: true,
   },
   price: {
-    type: mongoose.Decimal128,
+    type: mongoose.Types.Decimal128,
     required: true,
   },
   storeId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "",
+    ref: "Store",
     required: true,
   },
 });

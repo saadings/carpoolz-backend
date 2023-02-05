@@ -11,16 +11,16 @@ const StoreSchema = new mongoose.Schema({
     required: true,
   },
   longitude: {
-    type: Number,
+    type: mongoose.Types.Decimal128,
     required: true,
   },
   latitude: {
-    type: Number,
+    type: mongoose.Types.Decimal128,
     required: true,
   },
   vendorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "",
+    ref: "Vendor",
     required: true,
   },
   contactNumber: {
@@ -32,7 +32,7 @@ const StoreSchema = new mongoose.Schema({
     required: false,
   },
   rating: {
-    type: mongoose.Decimal128,
+    type: mongoose.Types.Decimal128,
     required: false,
   },
   timing: {

@@ -23,10 +23,9 @@ const PassengerTripsSchema = new mongoose.Schema({
   },
   tripID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "DriverTrips",
+    ref: "InitiateRide",
   },
   userID: {
-    //foreign
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },

@@ -26,14 +26,12 @@ const DriverTripsSchema = new mongoose.Schema({
     required: true,
   },
   driverID: {
-    //foreign
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
   vehicleID: {
-    //foreign
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Vehicle",
   },
 });
 

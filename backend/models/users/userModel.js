@@ -36,7 +36,7 @@ const UserSchema = new mongoose.Schema({
     required: false,
   },
   rating: {
-    type: mongoose.Decimal128,
+    type: mongoose.Types.Decimal128,
     required: false,
   },
   active: {

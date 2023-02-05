@@ -3,6 +3,7 @@ var mongoose = require("mongoose");
 const DriverModel = new mongoose.Schema({
   userID: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     require: true,
   },
   cnic: {

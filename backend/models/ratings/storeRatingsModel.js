@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const StoreRatingSchema = new mongoose.Schema({
   userID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "",
+    ref: "User",
   },
   storeID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "",
+    ref: "Store",
   },
   rating: {
     type: mongoose.Types.Decimal128,
