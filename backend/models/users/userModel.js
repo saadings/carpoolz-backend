@@ -57,12 +57,12 @@ const UserSchema = new mongoose.Schema({
 });
 
 // Database middleware
-UserSchema.pre("save", async (next) => {
-  const user = this;
-  if (user.isModified("password")) {
-    user.password = await bcrypt.hash(user.password, bcrypt.genSalt());
-  }
-  next();
-});
+// UserSchema.pre("save", async (next) => {
+//   const user = this;
+//   if (user.isModified("password")) {
+//     user.password = await bcrypt.hash(user.password, bcrypt.genSalt());
+//   }
+//   next();
+// });
 
 module.exports = mongoose.model("User", UserSchema);
