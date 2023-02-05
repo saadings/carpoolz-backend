@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Deal = new mongoose.Schema({
+const DealsSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -20,4 +20,4 @@ const Deal = new mongoose.Schema({
   },
 });
 
-module.export(Deal);
+module.export(DealsSchema);

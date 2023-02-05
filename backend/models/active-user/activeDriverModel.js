@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ActiveDriver = new mongoose.Schema({
+const ActiveDriverSchema = new mongoose.Schema({
   UID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "",
@@ -16,4 +16,4 @@ const ActiveDriver = new mongoose.Schema({
   },
 });
 
-module.export(ActiveDriver);
+module.export(ActiveDriverSchema);

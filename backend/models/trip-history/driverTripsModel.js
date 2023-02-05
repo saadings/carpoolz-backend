@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
-const PassengerTripsSchema = new mongoose.Schema({
+const DriverTripsSchema = new mongoose.Schema({
   source: {
     type: String,
     required: true,
   },
   destination: {
-    trpe: String,
+    type: String,
     required: true,
   },
   fare: {
@@ -21,15 +21,20 @@ const PassengerTripsSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  tripID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "DriverTrips",
+  numOfPassengers: {
+    type: Number,
+    required: true,
   },
-  userID: {
+  driverID: {
+    //foreign
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  vehicleID: {
     //foreign
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
 });
 
-module.export("PassengerTrips", PassengerTripsSchema);
+module.export("DriverTrips", DriverTripsSchema);
