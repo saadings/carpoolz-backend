@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
-var bcrypt = require("bcryptjs");
+const bcrypt = require("bcryptjs");
+const { resolve } = require("path");
+require("dotenv").config({
+  path: resolve(__dirname, "../config/.env"),
+});
 
 const UserSchema = new mongoose.Schema({
   userName: {
@@ -102,5 +106,19 @@ UserSchema.pre("save", async function (next) {
   }
   next();
 });
+
+UserSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+UserSchema.methods.generateJWTToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRE_TIME,
+  });
+};
+
+UserSchema.methods.generateRefreshToken = function () {
+  return jwt.sign({ id: this._id }, process.env.RT_SECRET_KEY);
+};
 
 module.exports = mongoose.model("User", UserSchema);
