@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const ActivePassenger = new mongoose.Schema({
+const ActivePassengerSchema = new mongoose.Schema({
   UID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "",
@@ -16,4 +16,4 @@ const ActivePassenger = new mongoose.Schema({
   },
 });
 
-module.export(ActivePassenger);
+module.exports = mongoose.model("ActivePassengers", ActivePassengerSchema);

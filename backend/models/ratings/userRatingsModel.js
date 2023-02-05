@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
-const StoreRatingSchema = new mongoose.Schema({
-  userID: {
+const UserRatingsSchema = new mongoose.Schema({
+  giverID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "",
   },
-  storeID: {
+  receiverID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "",
   },
@@ -14,4 +14,4 @@ const StoreRatingSchema = new mongoose.Schema({
   },
 });
 
-module.export(StoreRatingSchema);
+module.exports = mongoose.model("UserRatings", UserRatingsSchema);

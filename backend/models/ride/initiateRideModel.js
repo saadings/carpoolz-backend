@@ -23,4 +23,4 @@ const InitiateRideSchema = new mongoose.Schema({
   },
 });
 
-module.export(InitiateRideSchema);
+module.exports = mongoose.model("InitiateRide", InitiateRideSchema);

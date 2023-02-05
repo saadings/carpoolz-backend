@@ -32,4 +32,4 @@ const PassengerTripsSchema = new mongoose.Schema({
   },
 });
 
-module.export("PassengerTrips", PassengerTripsSchema);
+module.exports = mongoose.model("PassengerTrips", PassengerTripsSchema);

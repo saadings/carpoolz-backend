@@ -37,4 +37,4 @@ const DriverTripsSchema = new mongoose.Schema({
   },
 });
 
-module.export("DriverTrips", DriverTripsSchema);
+module.exports = mongoose.model("DriverTrips", DriverTripsSchema);

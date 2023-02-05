@@ -27,4 +27,4 @@ const VehicleSchema = new mongoose.Schema({
   },
 });
 
-module.export(VehicleSchema);
+module.exports = mongoose.model("Vehicle", VehicleSchema);

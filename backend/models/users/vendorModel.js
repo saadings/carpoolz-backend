@@ -12,4 +12,4 @@ const VendorSchema = new mongoose.Schema({
   },
 });
 
-module.export(VendorSchema);
+module.exports = mongoose.model("Vendor", VendorSchema);
