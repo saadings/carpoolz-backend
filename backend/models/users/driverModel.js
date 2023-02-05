@@ -9,14 +9,30 @@ const DriverModel = new mongoose.Schema({
   cnic: {
     type: String,
     required: true,
+    minlength: 11,
+    maxlength: 14,
+    validate: {
+      validator: function (value) {
+        return /^\d+$/.test(value);
+      },
+      message: "{VALUE} is not a valid CNIC. Write CNIC without '-'!",
+    },
   },
   licenseNo: {
     type: String,
     required: true,
+    validate: {
+      validator: function (value) {
+        return /[^-]+/.test(value);
+      },
+      message: "{VALUE} is not a valid license No. Write license No without '-'!",
+    },
   },
   rating: {
     type: mongoose.Types.Decimal128,
     required: true,
+    min: 0.0,
+    max: 5.0,
   },
 });
 

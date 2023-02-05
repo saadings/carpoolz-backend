@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+var bcrypt = require("bcryptjs");
 
 const UserSchema = new mongoose.Schema({
   userName: {
@@ -9,21 +10,47 @@ const UserSchema = new mongoose.Schema({
   firstName: {
     type: String,
     required: true,
+    validate: {
+      validator: function (value) {
+        return /^[a-zA-Z]+$/.test(value);
+      },
+      message: "{VALUE} is not a valid name",
+    },
   },
   lastName: {
     type: String,
     required: true,
+    validate: {
+      validator: function (value) {
+        return /^[a-zA-Z]+$/.test(value);
+      },
+      message: "{VALUE} is not a valid name",
+    },
   },
   email: {
     type: String,
     required: true,
     unique: true,
+    validate: {
+      validator: function (value) {
+        return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
+          value
+        );
+      },
+      message: "{VALUE} is not a valid email address!",
+    },
   },
   password: {
     type: String,
     required: true,
     minlength: 8,
-    maxlength: 32,
+    validate: {
+      validator: function (value) {
+        return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(value);
+      },
+      message:
+        "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number.",
+    },
   },
   contactNumber: {
     type: String,
@@ -40,29 +67,40 @@ const UserSchema = new mongoose.Schema({
   gender: {
     type: String,
     required: true,
+    enum: ["Male", "Female", "Other"],
   },
   image: {
     type: Buffer,
     required: false,
+    validate: {
+      validator: function (value) {
+        const allowedTypes = ["image/jpeg", "image/png"];
+        return allowedTypes.includes(value.contentType);
+      },
+      message: "Invalid image type. Only JPEG and PNG formats are allowed.",
+    },
   },
   rating: {
     type: mongoose.Types.Decimal128,
-    required: false,
+    required: true,
+    min: 0.0,
+    max: 5.0,
   },
   active: {
     type: Boolean,
-    required: false,
+    required: true,
     default: false,
   },
 });
 
-// Database middleware
-// UserSchema.pre("save", async (next) => {
-//   const user = this;
-//   if (user.isModified("password")) {
-//     user.password = await bcrypt.hash(user.password, bcrypt.genSalt());
-//   }
-//   next();
-// });
+//Database middleware
+UserSchema.pre("save", async function (next) {
+  const user = this;
+  if (user.isModified("password")) {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+  }
+  next();
+});
 
 module.exports = mongoose.model("User", UserSchema);

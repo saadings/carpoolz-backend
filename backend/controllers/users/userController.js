@@ -1,4 +1,5 @@
 const User = require("../../models/users/userModel");
+var bcrypt = require("bcryptjs");
 
 exports.registerUser = (req, res) => {
   const user = new User({
@@ -18,4 +19,15 @@ exports.registerUser = (req, res) => {
     .save()
     .then(() => res.json("User registered successfully"))
     .catch((err) => res.status(400).json("Error: " + err));
+};
+
+exports.login = async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) return res.status(400).send("Invalid email or password.");
+
+  const validPassword = await bcrypt.compare(req.body.password, user.password);
+  if (!validPassword) return res.status(400).send("Invalid email or password.");
+  else {
+    res.json("Login Successfully");
+  }
 };
