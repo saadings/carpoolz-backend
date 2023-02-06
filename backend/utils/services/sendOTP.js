@@ -5,7 +5,7 @@ require("dotenv").config({
 });
 const otpEmailTemplate = require("../../assets/otpEmailTemplate");
 
-module.exports = (receiver, otp) => {
+module.exports = async (receiver, otp, name) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -18,14 +18,17 @@ module.exports = (receiver, otp) => {
     from: process.env.MAIL_USER,
     to: receiver,
     subject: "Carpoolz OTP",
-    html: otpEmailTemplate,
+    html: otpEmailTemplate(otp, name),
   };
 
-  transporter.sendMail(mailOptions, function (error, info) {
+  await transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       console.log(error);
+      return false;
     } else {
       console.log("Email sent: " + info.response);
+
+      return true;
       // do something useful
     }
   });

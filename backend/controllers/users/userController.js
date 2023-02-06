@@ -39,6 +39,9 @@ exports.registerUser = async (req, res) => {
         message: "User already exists.",
       });
 
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
     // Create a new user
     const user = new User({
       userName: userName,
@@ -52,6 +55,14 @@ exports.registerUser = async (req, res) => {
       rating: 0.0,
       active: false,
     });
+
+    if (await !sendOtp(user.email, otp, user.userName)) {
+      return res.status(400).json({
+        success: false,
+        code: 3,
+        message: "Unable to send OTP.",
+      });
+    }
 
     // Save the user to the database
     user.save((error) => {
@@ -67,9 +78,6 @@ exports.registerUser = async (req, res) => {
           errors: validationErrors,
         });
       }
-
-      sendOtp(user.email, 123456);
-
       return res.status(201).json({
         success: true,
         code: 0,

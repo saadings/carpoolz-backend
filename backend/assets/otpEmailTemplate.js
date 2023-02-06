@@ -1,4 +1,5 @@
-module.exports = `<html>
+module.exports = function (OTP, name) {
+  return `<html>
 <head>
   <title>Confirm Your Account Verification</title>
   <style>
@@ -39,9 +40,9 @@ module.exports = `<html>
       <img src="[company logo URL]" alt="[Company Name]">
     </div>
     <p class="header">Confirm Your Account Verification</p>
-    <p>Dear [Name],</p>
+    <p>Dear ${name},</p>
     <p>Thank you for choosing our service! To complete your account setup, we need you to confirm your email address.</p>
-    <p>Please enter the following OTP (One Time Password) code in your account settings to verify your email address: <b>[insert OTP code here]</b>.</p>
+    <p>Please enter the following OTP (One Time Password) code in your account settings to verify your email address: <b>${OTP}</b>.</p>
     <p>This OTP is valid for the next 10 minutes, so please enter it as soon as possible to avoid any delays in accessing your account.</p>
     <p>If you did not request this verification, please let us know immediately so we can secure your account.</p>
     <p>Thank you for your cooperation and enjoy our services!</p>
@@ -50,3 +51,4 @@ module.exports = `<html>
   </div>
 </body>
 </html>`;
+};
