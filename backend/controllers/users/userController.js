@@ -1,4 +1,4 @@
-// const User = require("../../models/users/userModel");
+const User = require("../../models/users/userModel");
 const PendingUser = require("../../models/pending-user/pendingUserModel");
 const bcrypt = require("bcryptjs");
 var sendOtp = require("../../utils/services/sendOTP");
