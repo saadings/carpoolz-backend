@@ -1,5 +1,5 @@
 const User = require("../../models/users/userModel");
-const PendingUser = require("../../models/pending-user/pendingUserModel");
+const PendingUser = require("../../models/user-otp/userOTPModel");
 const bcrypt = require("bcryptjs");
 var sendOtp = require("../../utils/services/sendOTP");
 
@@ -54,7 +54,7 @@ exports.registerUser = async (req, res) => {
       gender: gender,
       image: req.body?.image,
       otp: otp,
-      // expiresAt: expiresAt,
+      ////expireAt: new Date(Date.now()),
     });
 
     // Save the pending user to the database
