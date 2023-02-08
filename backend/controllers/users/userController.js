@@ -141,6 +141,13 @@ exports.verifyOTP = async (req, res) => {
         message: "User doesn't exists.",
       });
 
+    if (users.active)
+      return res.status(400).json({
+        success: false,
+        code: -4,
+        message: "User already active.",
+      });
+
     const userOtp = await UserOTP.findOne({ userID: users._id });
     if (!userOtp)
       return res.status(400).json({
@@ -154,7 +161,7 @@ exports.verifyOTP = async (req, res) => {
     if (compareOTP?.code < 0)
       return res.status(400).json({
         success: false,
-        code: -2,
+        code: -3,
         message: compareOTP?.message,
       });
 
@@ -165,6 +172,23 @@ exports.verifyOTP = async (req, res) => {
         },
         { $set: { active: true } }
       );
+    } catch (error) {
+      if (error) {
+        const validationErrors = [];
+        for (field in error.errors) {
+          validationErrors.push(error.errors[field].message);
+        }
+        return res.status(400).json({
+          success: false,
+          code: -1,
+          message: "Validation failed in saving user.",
+          errors: validationErrors,
+        });
+      }
+    }
+
+    try {
+      await UserOTP.deleteOne({ userID: users._id });
     } catch (error) {
       if (error) {
         const validationErrors = [];
