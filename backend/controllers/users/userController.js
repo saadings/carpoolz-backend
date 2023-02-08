@@ -1,5 +1,5 @@
 const User = require("../../models/users/userModel");
-const PendingUser = require("../../models/user-otp/userOTPModel");
+//const PendingUser = require("../../models/pending-user/pendingUserModel");
 const bcrypt = require("bcryptjs");
 var sendOtp = require("../../utils/services/sendOTP");
 
@@ -54,7 +54,7 @@ exports.registerUser = async (req, res) => {
       gender: gender,
       image: req.body?.image,
       otp: otp,
-      ////expireAt: new Date(Date.now()),
+      //expireAt: new Date(Date.now()),
     });
 
     // Save the pending user to the database
@@ -169,12 +169,43 @@ exports.verifyOTP = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
-  if (!user) return res.status(400).send("Invalid email or password.");
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user)
+      return res.status(400).json({
+        success: false,
+        code: -2,
+        message: "Invalid email or password.",
+      });
+    else if (!user.active)
+      return res.status(400).json({
+        success: false,
+        code: -1,
+        message: "User is not activated",
+      });
 
-  const validPassword = await bcrypt.compare(req.body.password, user.password);
-  if (!validPassword) return res.status(400).send("Invalid email or password.");
-  else {
-    res.json("Login Successfully");
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    if (!validPassword)
+      return res.status(400).json({
+        success: false,
+        code: -1,
+        message: "Invalid email or password.",
+      });
+    else {
+      return res.status(201).json({
+        success: true,
+        code: 0,
+        message: "User Login Successfully",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      code: -1,
+      message: "Internal server error.",
+    });
   }
 };
