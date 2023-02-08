@@ -141,7 +141,15 @@ exports.verifyOTP = async (req, res) => {
         message: "User doesn't exists.",
       });
 
-    const compareOTP = await UserOTP.compareOTP(otp);
+    const userOtp = await UserOTP.findOne({ userID: users._id });
+    if (!userOtp)
+      return res.status(400).json({
+        success: false,
+        code: -2,
+        message: "User doesn't exists.",
+      });
+
+    const compareOTP = await userOtp.compareOTP(otp);
 
     if (compareOTP?.code < 0)
       return res.status(400).json({
@@ -150,10 +158,13 @@ exports.verifyOTP = async (req, res) => {
         message: compareOTP?.message,
       });
 
-    users.active = true;
-
     try {
-      await user.save();
+      await User.updateOne(
+        {
+          $and: [{ userName: userName }, { email: email }],
+        },
+        { $set: { active: true } }
+      );
     } catch (error) {
       if (error) {
         const validationErrors = [];
