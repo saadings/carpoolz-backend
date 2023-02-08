@@ -1,7 +1,7 @@
 const User = require("../../models/users/userModel");
-const PendingUser = require("../../models/user-otp/userOTPModel");
+const UserOTP = require("../../models/user-otp/userOTPModel");
 const bcrypt = require("bcryptjs");
-var sendOtp = require("../../utils/services/sendOTP");
+const sendOtp = require("../../utils/services/sendOTP");
 
 exports.registerUser = async (req, res) => {
   const {
@@ -30,7 +30,7 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    const alreadyExists = await PendingUser.findOne({
+    const alreadyExists = await User.findOne({
       $or: [{ userName: userName }, { email: email }],
     });
 
@@ -41,10 +41,7 @@ exports.registerUser = async (req, res) => {
         message: "User already exists.",
       });
 
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
-
-    const pendingUser = new PendingUser({
+    const user = new User({
       userName: userName,
       email: email,
       password: password,
@@ -53,12 +50,13 @@ exports.registerUser = async (req, res) => {
       contactNumber: contactNumber,
       gender: gender,
       image: req.body?.image,
-      otp: otp,
-      ////expireAt: new Date(Date.now()),
+      rating: 0.0,
+      active: false,
     });
 
-    // Save the pending user to the database
-    pendingUser.save((error) => {
+    try {
+      await user.save();
+    } catch (error) {
       if (error) {
         const validationErrors = [];
         for (field in error.errors) {
@@ -67,24 +65,50 @@ exports.registerUser = async (req, res) => {
         return res.status(400).json({
           success: false,
           code: -1,
-          message: "Validation failed",
+          message: "Validation failed in saving user.",
           errors: validationErrors,
         });
       }
+    }
 
-      if (!sendOtp(pendingUser.email, otp, pendingUser.userName)) {
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
+
+    const userOtp = new UserOTP({
+      userID: user._id,
+      otp: otp,
+      expiryTime: expiryTime,
+    });
+
+    try {
+      await userOtp.save();
+    } catch (error) {
+      if (error) {
+        const validationErrors = [];
+        for (field in error.errors) {
+          validationErrors.push(error.errors[field].message);
+        }
         return res.status(400).json({
           success: false,
-          code: -3,
-          message: "Unable to send OTP.",
+          code: -1,
+          message: "Validation failed in saving otp.",
+          errors: validationErrors,
         });
       }
+    }
 
-      return res.status(201).json({
-        success: true,
-        code: 0,
-        message: "User created successfully.",
+    if (!sendOtp(user.email, otp, user.userName)) {
+      return res.status(400).json({
+        success: false,
+        code: -3,
+        message: "Unable to send OTP.",
       });
+    }
+
+    return res.status(201).json({
+      success: true,
+      code: 0,
+      message: "User created successfully.",
     });
   } catch (error) {
     return res.status(500).json({
@@ -106,18 +130,18 @@ exports.verifyOTP = async (req, res) => {
         message: "Please provide all the required fields.",
       });
 
-    const pendingUser = await PendingUser.findOne({
+    const users = await User.findOne({
       $and: [{ userName: userName }, { email: email }],
     });
 
-    if (!pendingUser)
+    if (!users)
       return res.status(400).json({
         success: false,
         code: -2,
         message: "User doesn't exists.",
       });
 
-    const compareOTP = await pendingUser.compareOTP(otp);
+    const compareOTP = await UserOTP.compareOTP(otp);
 
     if (compareOTP?.code < 0)
       return res.status(400).json({
@@ -126,21 +150,11 @@ exports.verifyOTP = async (req, res) => {
         message: compareOTP?.message,
       });
 
-    const user = new User({
-      userName: pendingUser.userName,
-      email: pendingUser.email,
-      password: pendingUser.password,
-      firstName: pendingUser.firstName,
-      lastName: pendingUser.lastName,
-      contactNumber: pendingUser.contactNumber,
-      gender: pendingUser.gender,
-      image: pendingUser.image,
-      rating: 0.0,
-      active: true,
-    });
+    users.active = true;
 
-    // Save the user to the database
-    user.save((error) => {
+    try {
+      await user.save();
+    } catch (error) {
       if (error) {
         const validationErrors = [];
         for (field in error.errors) {
@@ -149,15 +163,16 @@ exports.verifyOTP = async (req, res) => {
         return res.status(400).json({
           success: false,
           code: -1,
-          message: "Validation failed",
+          message: "Validation failed in saving user.",
           errors: validationErrors,
         });
       }
-      return res.status(201).json({
-        success: true,
-        code: 0,
-        message: "User created successfully.",
-      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      code: 0,
+      message: "User verified successfully.",
     });
   } catch (error) {
     return res.status(500).json({
