@@ -54,7 +54,7 @@ exports.registerUser = async (req, res) => {
       gender: gender,
       image: req.body?.image,
       otp: otp,
-      expiresAt: expiresAt,
+      // expiresAt: expiresAt,
     });
 
     // Save the pending user to the database

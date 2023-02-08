@@ -91,17 +91,19 @@ const PendingUserSchema = new mongoose.Schema({
       message: "OTP must be of length 6 and should only contain digits.",
     },
   },
-  expiresAt: {
-    type: Date,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-    required: true,
-    expires: "86400s", // 1 day in seconds
-    // expires: "30s", // 1 day in seconds
-  },
+  expirationDate: { type: Date, default: Date.now, expires: "2m" },
+  // expireAt: {
+  //   type: Date,
+  //   default: Date.now,
+  //   expires: "120s", // 1 day in seconds
+  // },
+  // createdAt: {
+  //   type: Date,
+  //   default: Date.now,
+  //   required: true,
+  //   // expires: 15, // 1 day in seconds
+  //   // expires: "30s", // 1 day in seconds
+  // },
 });
 
 //Database middleware
@@ -111,10 +113,10 @@ PendingUserSchema.pre("save", async function (next) {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
   }
-  if (user.isModified("otp")) {
-    const salt = await bcrypt.genSalt(10);
-    user.otp = await bcrypt.hash(user.otp, salt);
-  }
+  // if (user.isModified("otp")) {
+  //   const salt = await bcrypt.genSalt(10);
+  //   user.otp = await bcrypt.hash(user.otp, salt);
+  // }
   next();
 });
 
@@ -131,5 +133,8 @@ PendingUserSchema.methods.compareOTP = async function (enteredOTP) {
     ? { code: 0, message: "OTP verified." }
     : { code: -2, message: "OTP Invalid." };
 };
+
+// Setting up TTL
+// PendingUserSchema.index({ expirationDate: 1 }, { expireAfterSeconds: 60 });
 
 module.exports = mongoose.model("PendingUser", PendingUserSchema);
