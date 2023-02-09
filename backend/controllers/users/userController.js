@@ -1,7 +1,9 @@
-var bcrypt = require("bcryptjs");
+var UserSession = require("../../models/user-session/userSessionModel");
 var User = require("../../models/users/userModel");
 var UserOTP = require("../../models/user-otp/userOTPModel");
 var sendOtp = require("../../utils/services/sendOTP");
+const validationError = require("../../utils/errorHandling/validationError");
+const serverError = require("../../utils/errorHandling/serverError");
 
 exports.registerUser = async (req, res) => {
   var {
@@ -21,7 +23,8 @@ exports.registerUser = async (req, res) => {
       !password ||
       !firstName ||
       !lastName ||
-      !contactNumber
+      !contactNumber ||
+      !gender
     ) {
       return res.status(400).json({
         success: false,
@@ -57,18 +60,7 @@ exports.registerUser = async (req, res) => {
     try {
       await user.save();
     } catch (error) {
-      if (error) {
-        var validationErrors = [];
-        for (field in error.errors) {
-          validationErrors.push(error.errors[field].message);
-        }
-        return res.status(400).json({
-          success: false,
-          code: -1,
-          message: "Validation failed in saving user.",
-          errors: validationErrors,
-        });
-      }
+      return res.status(400).json(validationError(error));
     }
 
     var otp = Math.floor(100000 + Math.random() * 900000);
@@ -83,18 +75,7 @@ exports.registerUser = async (req, res) => {
     try {
       await userOtp.save();
     } catch (error) {
-      if (error) {
-        var validationErrors = [];
-        for (field in error.errors) {
-          validationErrors.push(error.errors[field].message);
-        }
-        return res.status(400).json({
-          success: false,
-          code: -1,
-          message: "Validation failed in saving otp.",
-          errors: validationErrors,
-        });
-      }
+      return res.status(400).json(validationError(error));
     }
 
     if (!sendOtp(user.email, otp, user.userName)) {
@@ -111,11 +92,7 @@ exports.registerUser = async (req, res) => {
       message: "User created successfully.",
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      code: -1,
-      message: "Internal server error.",
-    });
+    return res.status(500).json(serverError);
   }
 };
 
@@ -173,18 +150,7 @@ exports.verifyOTP = async (req, res) => {
         { $set: { active: true } }
       );
     } catch (error) {
-      if (error) {
-        var validationErrors = [];
-        for (field in error.errors) {
-          validationErrors.push(error.errors[field].message);
-        }
-        return res.status(400).json({
-          success: false,
-          code: -1,
-          message: "Validation failed in saving user.",
-          errors: validationErrors,
-        });
-      }
+      return res.status(400).json(validationError(error));
     }
 
     try {
@@ -210,11 +176,7 @@ exports.verifyOTP = async (req, res) => {
       message: "User verified successfully.",
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      code: -1,
-      message: "Internal server error.",
-    });
+    return res.status(500).json(serverError);
   }
 };
 
@@ -263,18 +225,7 @@ exports.resendOTP = async (req, res) => {
       userOtp.expiryTime = expiryTime;
       await userOtp.save();
     } catch (error) {
-      if (error) {
-        var validationErrors = [];
-        for (field in error.errors) {
-          validationErrors.push(error.errors[field].message);
-        }
-        return res.status(400).json({
-          success: false,
-          code: -1,
-          message: "Validation failed in updating re-send otp.",
-          errors: validationErrors,
-        });
-      }
+      return res.status(400).json(validationError(error));
     }
 
     if (!sendOtp(user.email, otp, user.userName)) {
@@ -291,49 +242,115 @@ exports.resendOTP = async (req, res) => {
       message: "OTP re-sent successfully.",
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      code: -1,
-      message: "Internal server error.",
-    });
+    return res.status(500).json(serverError);
   }
 };
 
 exports.login = async (req, res) => {
+  var { userName, email, password } = req.body;
+
   try {
-    var user = await User.findOne({ email: req.body.email });
+    if ((!userName && !email) || !password) {
+      return res.status(400).json({
+        success: false,
+        code: -1,
+        message: "Please provide all the required fields.",
+      });
+    }
+
+    var user = await User.findOne({
+      $or: [{ userName: userName }, { email: email }],
+    });
+
     if (!user)
       return res.status(400).json({
         success: false,
         code: -2,
-        message: "Invalid email or password.",
-      });
-    else if (!user.active)
-      return res.status(400).json({
-        success: false,
-        code: -1,
-        message: "User is not activated",
+        message: "Invalid username, email or password.",
       });
 
-    var validPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!user.active)
+      return res.status(400).json({
+        success: false,
+        code: -3,
+        message: "User is not active",
+      });
+
+    var validPassword = await user.comparePassword(password);
     if (!validPassword)
       return res.status(400).json({
         success: false,
-        code: -1,
-        message: "Invalid email or password.",
+        code: -2,
+        message: "Invalid username, email or password.",
       });
-    else {
-      return res.status(201).json({
-        success: true,
-        code: 0,
-        message: "User Login Successfully",
+
+    var userLog = await UserSession.findOne({ userID: user._id });
+
+    if (userLog)
+      return res.status(400).json({
+        success: false,
+        code: -4,
+        message: "User already logged in.",
+      });
+
+    var accessToken = user.generateJWTToken();
+    var refreshToken = user.generateRefreshToken();
+
+    var userSession = new UserSession({
+      userID: user._id,
+      refreshToken: refreshToken,
+    });
+
+    try {
+      await userSession.save();
+    } catch (error) {
+      return res.status(400).json(validationError(error));
+    }
+
+    return res.status(201).json({
+      success: true,
+      code: 0,
+      message: "User logged in Successfully",
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    return res.status(500).json(serverError);
+  }
+};
+
+exports.refreshToken = async (req, res) => {
+  var { refreshToken } = req.body;
+
+  try {
+    if (!refreshToken)
+      return res.status(400).json({
+        success: false,
+        code: -1,
+        message: "Please provide all the required fields.",
+      });
+
+    var userToken = UserSession.findOne({ refreshToken: refreshToken });
+
+    if (!userToken)
+      return res.status(400).json({
+        success: false,
+        code: -2,
+        message: "User not logged in.",
+      });
+
+    var tokenVerify = userToken.verifyToken(refreshToken);
+
+    if (!tokenVerify) {
+      return res.status(400).json({
+        success: false,
+        code: -3,
+        message: "Token invalid.",
       });
     }
+
+    var accessToken;
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      code: -1,
-      message: "Internal server error.",
-    });
+    return res.status(500).json(serverError);
   }
 };
