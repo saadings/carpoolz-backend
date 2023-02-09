@@ -108,6 +108,17 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
+// Middleware for deleting OTP if the user verifies
+UserSchema.pre("deleteMany", async function (next) {
+  // Get the query conditions
+  const conditions = this.getQuery();
+
+  // Remove all the child documents that have a reference to the parent ids
+  mongoose
+    .model("UserOTP")
+    .deleteMany({ parent: { $in: conditions._id } }, next);
+});
+
 UserSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

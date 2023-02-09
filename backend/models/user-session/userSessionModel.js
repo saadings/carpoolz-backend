@@ -8,11 +8,11 @@ const UserSessionSchema = new mongoose.Schema({
   },
   jwt: {
     type: String,
-    required: true,
+    // required: true,
   },
   refreshToken: {
     type: String,
-    required: false,
+    // required: false,
   },
 });
 

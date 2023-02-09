@@ -37,7 +37,6 @@ UserOTPSchema.pre("save", async function (next) {
 
 UserOTPSchema.methods.compareOTP = async function (enteredOTP) {
   const timeDiff = Date.now() - this.expiryTime;
-  console.log("Hi");
 
   if (timeDiff > 0)
     return {

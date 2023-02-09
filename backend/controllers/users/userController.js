@@ -1,10 +1,10 @@
-const User = require("../../models/users/userModel");
-const UserOTP = require("../../models/user-otp/userOTPModel");
-const bcrypt = require("bcryptjs");
-const sendOtp = require("../../utils/services/sendOTP");
+var bcrypt = require("bcryptjs");
+var User = require("../../models/users/userModel");
+var UserOTP = require("../../models/user-otp/userOTPModel");
+var sendOtp = require("../../utils/services/sendOTP");
 
 exports.registerUser = async (req, res) => {
-  const {
+  var {
     userName,
     email,
     password,
@@ -30,7 +30,7 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    const alreadyExists = await User.findOne({
+    var alreadyExists = await User.findOne({
       $or: [{ userName: userName }, { email: email }],
     });
 
@@ -41,7 +41,7 @@ exports.registerUser = async (req, res) => {
         message: "User already exists.",
       });
 
-    const user = new User({
+    var user = new User({
       userName: userName,
       email: email,
       password: password,
@@ -58,7 +58,7 @@ exports.registerUser = async (req, res) => {
       await user.save();
     } catch (error) {
       if (error) {
-        const validationErrors = [];
+        var validationErrors = [];
         for (field in error.errors) {
           validationErrors.push(error.errors[field].message);
         }
@@ -71,10 +71,10 @@ exports.registerUser = async (req, res) => {
       }
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000);
-    const expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
+    var otp = Math.floor(100000 + Math.random() * 900000);
+    var expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
 
-    const userOtp = new UserOTP({
+    var userOtp = new UserOTP({
       userID: user._id,
       otp: otp,
       expiryTime: expiryTime,
@@ -84,7 +84,7 @@ exports.registerUser = async (req, res) => {
       await userOtp.save();
     } catch (error) {
       if (error) {
-        const validationErrors = [];
+        var validationErrors = [];
         for (field in error.errors) {
           validationErrors.push(error.errors[field].message);
         }
@@ -121,7 +121,7 @@ exports.registerUser = async (req, res) => {
 
 exports.verifyOTP = async (req, res) => {
   try {
-    const { userName, email, otp } = req.body;
+    var { userName, email, otp } = req.body;
 
     if (!userName || !email || !otp)
       return res.status(400).json({
@@ -130,7 +130,7 @@ exports.verifyOTP = async (req, res) => {
         message: "Please provide all the required fields.",
       });
 
-    const users = await User.findOne({
+    var users = await User.findOne({
       $and: [{ userName: userName }, { email: email }],
     });
 
@@ -148,7 +148,7 @@ exports.verifyOTP = async (req, res) => {
         message: "User already active.",
       });
 
-    const userOtp = await UserOTP.findOne({ userID: users._id });
+    var userOtp = await UserOTP.findOne({ userID: users._id });
     if (!userOtp)
       return res.status(400).json({
         success: false,
@@ -156,7 +156,7 @@ exports.verifyOTP = async (req, res) => {
         message: "User doesn't exists.",
       });
 
-    const compareOTP = await userOtp.compareOTP(otp);
+    var compareOTP = await userOtp.compareOTP(otp);
 
     if (compareOTP?.code < 0)
       return res.status(400).json({
@@ -174,7 +174,7 @@ exports.verifyOTP = async (req, res) => {
       );
     } catch (error) {
       if (error) {
-        const validationErrors = [];
+        var validationErrors = [];
         for (field in error.errors) {
           validationErrors.push(error.errors[field].message);
         }
@@ -191,7 +191,7 @@ exports.verifyOTP = async (req, res) => {
       await UserOTP.deleteOne({ userID: users._id });
     } catch (error) {
       if (error) {
-        const validationErrors = [];
+        var validationErrors = [];
         for (field in error.errors) {
           validationErrors.push(error.errors[field].message);
         }
@@ -218,9 +218,90 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
+exports.resendOTP = async (req, res) => {
+  try {
+    var { userName, email } = req.body;
+
+    if (!userName || !email)
+      return res.status(400).json({
+        success: false,
+        code: -1,
+        message: "Please provide all the required fields.",
+      });
+
+    var user = await User.findOne({
+      $and: [{ userName: userName }, { email: email }],
+    });
+
+    if (!user)
+      return res.status(400).json({
+        success: false,
+        code: -2,
+        message: "User doesn't exists.",
+      });
+
+    if (user.active)
+      return res.status(400).json({
+        success: false,
+        code: -4,
+        message: "User already active.",
+      });
+
+    var userOtp = await UserOTP.findOne({ userID: user._id });
+    if (!userOtp)
+      return res.status(400).json({
+        success: false,
+        code: -2,
+        message: "User doesn't exists.",
+      });
+
+    var otp = Math.floor(100000 + Math.random() * 900000);
+    var expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
+
+    try {
+      userOtp.otp = otp;
+      userOtp.expiryTime = expiryTime;
+      await userOtp.save();
+    } catch (error) {
+      if (error) {
+        var validationErrors = [];
+        for (field in error.errors) {
+          validationErrors.push(error.errors[field].message);
+        }
+        return res.status(400).json({
+          success: false,
+          code: -1,
+          message: "Validation failed in updating re-send otp.",
+          errors: validationErrors,
+        });
+      }
+    }
+
+    if (!sendOtp(user.email, otp, user.userName)) {
+      return res.status(400).json({
+        success: false,
+        code: -3,
+        message: "Unable to send OTP.",
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      code: 0,
+      message: "OTP re-sent successfully.",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      code: -1,
+      message: "Internal server error.",
+    });
+  }
+};
+
 exports.login = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    var user = await User.findOne({ email: req.body.email });
     if (!user)
       return res.status(400).json({
         success: false,
@@ -234,10 +315,7 @@ exports.login = async (req, res) => {
         message: "User is not activated",
       });
 
-    const validPassword = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
+    var validPassword = await bcrypt.compare(req.body.password, user.password);
     if (!validPassword)
       return res.status(400).json({
         success: false,
