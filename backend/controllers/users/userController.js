@@ -92,7 +92,7 @@ exports.registerUser = async (req, res) => {
       message: "User created successfully.",
     });
   } catch (error) {
-    return res.status(500).json(serverError);
+    return res.status(500).json(serverError());
   }
 };
 
@@ -176,7 +176,7 @@ exports.verifyOTP = async (req, res) => {
       message: "User verified successfully.",
     });
   } catch (error) {
-    return res.status(500).json(serverError);
+    return res.status(500).json(serverError());
   }
 };
 
@@ -242,7 +242,7 @@ exports.resendOTP = async (req, res) => {
       message: "OTP re-sent successfully.",
     });
   } catch (error) {
-    return res.status(500).json(serverError);
+    return res.status(500).json(serverError());
   }
 };
 
@@ -315,7 +315,7 @@ exports.login = async (req, res) => {
       refreshToken,
     });
   } catch (error) {
-    return res.status(500).json(serverError);
+    return res.status(500).json(serverError());
   }
 };
 
@@ -351,6 +351,6 @@ exports.refreshToken = async (req, res) => {
 
     var accessToken;
   } catch (error) {
-    return res.status(500).json(serverError);
+    return res.status(500).json(serverError());
   }
 };
