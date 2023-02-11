@@ -5,8 +5,8 @@ const {
 const UserSession = require("../../models/user-session/userSessionModel");
 
 exports.isJWTExpired = async (req, res, next) => {
-  const bearerHeader = req.headers["authorization"];
-  const refreshToken = req.body.refreshToken;
+  var bearerHeader = req.headers["authorization"];
+  var refreshToken = req.body.refreshToken;
 
   if (typeof bearerHeader === "undefined" || !refreshToken)
     return res.status(403).json({
@@ -15,8 +15,8 @@ exports.isJWTExpired = async (req, res, next) => {
       message: "Tokens not present.",
     });
 
-  const bearer = bearerHeader.split(" ");
-  const bearerToken = bearer[1];
+  var bearer = bearerHeader.split(" ");
+  var bearerToken = bearer[1];
 
   if (isJWTStillValid(bearerToken))
     return res.status(403).json({
@@ -59,8 +59,8 @@ exports.isJWTExpired = async (req, res, next) => {
   next();
 };
 
-exports.isJWTValid = (req, res, next) => {
-  const bearerHeader = req.headers["authorization"];
+exports.isJWTValid = async (req, res, next) => {
+  var bearerHeader = req.headers["authorization"];
 
   if (typeof bearerHeader === "undefined")
     return res.status(403).json({
@@ -69,8 +69,8 @@ exports.isJWTValid = (req, res, next) => {
       message: "JWT not present.",
     });
 
-  const bearer = bearerHeader.split(" ");
-  const bearerToken = bearer[1];
+  var bearer = bearerHeader.split(" ");
+  var bearerToken = bearer[1];
 
   if (!isJWTStillValid(bearerToken))
     return res.status(403).json({
@@ -78,7 +78,14 @@ exports.isJWTValid = (req, res, next) => {
       code: -2,
       message: "JWT expired.",
     });
-
+  
+  var userLog = await UserSession.findOne({accessToken: bearerToken})
+  if (!userLog)
+    return res.status(403).json({
+      success: false,
+      code: -3,
+      message: "User not logged in.",
+    });
   req.token = bearerToken;
 
   next();

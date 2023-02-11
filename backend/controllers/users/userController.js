@@ -331,6 +331,61 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+exports.logoutUser = async (req, res) => {
+  var { userName, email } = req.body;
+
+  try {
+    if (!userName && !email) {
+      return res.status(400).json({
+        success: false,
+        code: -1,
+        message: "Please provide all the required fields.",
+      });
+    }
+
+    var user = await User.findOne({
+      $or: [{ userName: userName }, { email: email }],
+    });
+
+    if (!user)
+      return res.status(400).json({
+        success: false,
+        code: -2,
+        message: "Invalid username or email.",
+      });
+
+    if (!user.active)
+      return res.status(400).json({
+        success: false,
+        code: -3,
+        message: "User is not active",
+      });
+
+    var userLog = await UserSession.findOne({ userID: user._id });
+
+    if (!userLog)
+      return res.status(400).json({
+        success: false,
+        code: -4,
+        message: "User not logged in.",
+      });
+
+    try {
+      await UserSession.deleteOne({ userID: userLog.userID });
+    } catch (error) {
+      return res.status(400).json(validationError(error));
+    }
+
+    return res.status(201).json({
+      success: true,
+      code: 0,
+      message: "User logged out Successfully",
+    });
+  } catch (error) {
+    return res.status(500).json(serverError());
+  }
+};
+
 exports.refreshToken = async (req, res) => {
   var { refreshToken } = req.body;
 
@@ -366,7 +421,7 @@ exports.refreshToken = async (req, res) => {
       email: decodeRefreshToken.email,
     });
 
-    var userLog = await UserSession({ refreshToken: refreshToken });
+    var userLog = await UserSession.findOne({ refreshToken: refreshToken });
 
     userLog.accessToken = accessToken;
 
