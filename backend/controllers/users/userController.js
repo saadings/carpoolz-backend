@@ -4,6 +4,11 @@ var UserOTP = require("../../models/user-otp/userOTPModel");
 var sendOtp = require("../../utils/services/sendOTP");
 const validationError = require("../../utils/errorHandling/validationError");
 const serverError = require("../../utils/errorHandling/serverError");
+const {
+  generateJWTToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} = require("../../utils/services/jwt");
 
 exports.registerUser = async (req, res) => {
   var {
@@ -246,7 +251,7 @@ exports.resendOTP = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+exports.loginUser = async (req, res) => {
   var { userName, email, password } = req.body;
 
   try {
@@ -286,23 +291,30 @@ exports.login = async (req, res) => {
 
     var userLog = await UserSession.findOne({ userID: user._id });
 
-    if (userLog)
-      return res.status(400).json({
-        success: false,
-        code: -4,
-        message: "User already logged in.",
-      });
-
-    var accessToken = user.generateJWTToken();
-    var refreshToken = user.generateRefreshToken();
-
-    var userSession = new UserSession({
-      userID: user._id,
-      refreshToken: refreshToken,
+    var accessToken = generateJWTToken({
+      id: user._id,
+      userName: user.userName,
+      email: user.email,
     });
 
+    var refreshToken = generateRefreshToken({
+      id: user._id,
+      userName: user.userName,
+      email: user.email,
+    });
+
+    if (!userLog)
+      userLog = new UserSession({
+        userID: user._id,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
+    else
+      (userLog.accessToken = accessToken),
+        (userLog.refreshToken = refreshToken);
+
     try {
-      await userSession.save();
+      await userLog.save();
     } catch (error) {
       return res.status(400).json(validationError(error));
     }
@@ -323,33 +335,53 @@ exports.refreshToken = async (req, res) => {
   var { refreshToken } = req.body;
 
   try {
-    if (!refreshToken)
-      return res.status(400).json({
-        success: false,
-        code: -1,
-        message: "Please provide all the required fields.",
-      });
+    // if (!refreshToken)
+    //   return res.status(400).json({
+    //     success: false,
+    //     code: -1,
+    //     message: "Please provide all the required fields.",
+    //   });
 
-    var userToken = UserSession.findOne({ refreshToken: refreshToken });
+    // var userToken = await UserSession.findOne({ refreshToken: refreshToken });
 
-    if (!userToken)
-      return res.status(400).json({
-        success: false,
-        code: -2,
-        message: "User not logged in.",
-      });
+    // if (!userToken)
+    //   return res.status(400).json({
+    //     success: false,
+    //     code: -2,
+    //     message: "User not logged in.",
+    //   });
 
-    var tokenVerify = userToken.verifyToken(refreshToken);
+    var decodeRefreshToken = verifyRefreshToken(refreshToken);
 
-    if (!tokenVerify) {
-      return res.status(400).json({
-        success: false,
-        code: -3,
-        message: "Token invalid.",
-      });
+    // if (decodeRefreshToken.id !== userToken.userID.toString())
+    //   return res.status(400).json({
+    //     success: false,
+    //     code: -2,
+    //     message: "Invalid refresh token.",
+    //   });
+
+    var accessToken = generateJWTToken({
+      id: decodeRefreshToken.id,
+      userName: decodeRefreshToken.userName,
+      email: decodeRefreshToken.email,
+    });
+
+    var userLog = await UserSession({ refreshToken: refreshToken });
+
+    userLog.accessToken = accessToken;
+
+    try {
+      await userLog.save();
+    } catch (error) {
+      return res.status(400).json(validationError(error));
     }
 
-    var accessToken;
+    return res.status(200).json({
+      success: true,
+      code: 0,
+      message: "JWT refreshed successfully",
+      accessToken,
+    });
   } catch (error) {
     return res.status(500).json(serverError());
   }

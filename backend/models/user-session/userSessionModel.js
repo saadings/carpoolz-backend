@@ -11,13 +11,17 @@ const UserSessionSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  accessToken: {
+    type: String,
+    required: true,
+  },
   refreshToken: {
     type: String,
     required: true,
   },
 });
 
-UserSessionSchema.method.verifyToken = function (refreshToken) {
+UserSessionSchema.method.verifyRefreshToken = function (refreshToken) {
   if (refreshToken !== this.refreshToken) return false;
   return jwt.verify(refreshToken, process.env.RT_SECRET_KEY);
 };

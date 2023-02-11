@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { resolve } = require("path");
-require("dotenv").config({
-  path: resolve(__dirname, "../config/.env"),
-});
+require("../../utils/getEnv");
 
 const UserSchema = new mongoose.Schema({
   userName: {
@@ -122,26 +119,6 @@ UserSchema.pre("deleteMany", async function (next) {
 
 UserSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
-};
-
-UserSchema.methods.generateJWTToken = function () {
-  return jwt.sign(
-    { id: this._id, userName: this.userName, email: this.email },
-    process.env.JWT_SECRET_KEY,
-    {
-      expiresIn: process.env.JWT_EXPIRE_TIME,
-    }
-  );
-};
-
-UserSchema.methods.generateRefreshToken = function () {
-  return jwt.sign(
-    { id: this._id, userName: this.userName, email: this.email },
-    process.env.RT_SECRET_KEY,
-    {
-      expiresIn: process.env.RT_EXPIRE_TIME,
-    }
-  );
 };
 
 module.exports = mongoose.model("User", UserSchema);
