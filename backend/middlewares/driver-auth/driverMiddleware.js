@@ -1,5 +1,6 @@
 const User = require("../../models/users/userModel");
 const Driver = require("../../models/users/driverModel");
+const UserSession = require("../../models/user-session/userSessionModel");
 
 exports.isDriver = async (req, res, next) => {
   const { userName } = req.body;

@@ -6,7 +6,6 @@ const {
   isJWTExpired,
   isJWTValid,
 } = require("../middlewares/jwt/jwtMiddleware");
-
 /* GET users listing. */
 router.post("/register", userController.registerUser);
 router.post("/verify/otp", userController.verifyOTP);
