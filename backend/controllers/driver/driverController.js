@@ -5,7 +5,7 @@ var Driver = require("../../models/users/driverModel");
 exports.registerDriver = async (req, res) => {
   const { userName, cnic, licenseNo } = req.body;
   try {
-    if (!userName || !cnic || !licenseNo || !rating) {
+    if (!userName || !cnic || !licenseNo) {
       return res.status(400).json({
         success: false,
         code: -1,

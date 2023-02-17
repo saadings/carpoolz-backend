@@ -13,18 +13,18 @@ exports.isDriver = async (req, res, next) => {
     return res.status(403).json({
       success: false,
       code: -2,
-      message: "User does not exist.",
+      message: "User not registered.",
     });
 
   var driver = await Driver.findOne({
     userID: user._id,
   });
 
-  if (!driver)
+  if (driver)
     return res.status(403).json({
       success: false,
       code: -2,
-      message: "Driver does not exist.",
+      message: "Driver already registered.",
     });
 
   next();
