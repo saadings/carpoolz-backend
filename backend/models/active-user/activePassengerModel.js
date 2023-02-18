@@ -16,6 +16,7 @@ const ActivePassengerSchema = new mongoose.Schema({
     required: true,
   },
   route: {
+    type: {},
     required: true,
   },
 });

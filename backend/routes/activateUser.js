@@ -5,6 +5,6 @@ const activeUserController = require("../controllers/activate-user/activateUserC
 const { isJWTValid } = require("../middlewares/jwt/jwtMiddleware");
 
 router.post("/driver", isJWTValid, activeUserController.activeDriver);
-router.post("/passenger", isJWTValid);
+router.post("/passenger", isJWTValid, activeUserController.activePassenger);
 
 module.exports = router;
