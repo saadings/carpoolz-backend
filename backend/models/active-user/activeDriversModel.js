@@ -15,6 +15,10 @@ const ActiveDriversSchema = new mongoose.Schema({
     type: LocationSchema,
     required: true,
   },
+  route: {
+    type: {},
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("ActiveDrivers", ActiveDriversSchema);

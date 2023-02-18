@@ -15,6 +15,9 @@ const ActivePassengerSchema = new mongoose.Schema({
     type: LocationSchema,
     required: true,
   },
+  route: {
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("ActivePassengers", ActivePassengerSchema);
