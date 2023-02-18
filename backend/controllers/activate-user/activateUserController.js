@@ -48,7 +48,7 @@ exports.activeDriver = async (req, res) => {
       });
 
     var newActiveDriver = new ActiveDriver({
-      driverID: driver._id,
+      userID: driver._id,
       origin: origin,
       destination: destination,
       route: route,
@@ -63,7 +63,7 @@ exports.activeDriver = async (req, res) => {
     return res.status(201).json({
       success: true,
       code: 0,
-      message: "Driver created successfully.",
+      message: "Driver activated successfully.",
     });
   } catch (error) {
     return res.status(500).json(serverError());
