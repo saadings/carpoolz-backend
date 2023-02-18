@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { LocationSchema } = require("../location/locationSchema");
 
 const ActivePassengerSchema = new mongoose.Schema({
   userID: {
@@ -6,12 +7,12 @@ const ActivePassengerSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  longitude: {
-    type: mongoose.Types.Decimal128,
+  origin: {
+    type: LocationSchema,
     required: true,
   },
-  latitude: {
-    type: mongoose.Types.Decimal128,
+  destination: {
+    type: LocationSchema,
     required: true,
   },
 });

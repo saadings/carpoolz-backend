@@ -1,5 +1,4 @@
 var User = require("../../models/users/userModel");
-var User = require("../../models/users/userModel");
 var Driver = require("../../models/users/driverModel");
 var Vehicle = require("../../models/vehicle/vehicleModel");
 
