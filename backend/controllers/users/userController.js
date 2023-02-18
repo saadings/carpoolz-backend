@@ -105,7 +105,7 @@ exports.verifyOTP = async (req, res) => {
   try {
     var { userName, email, otp } = req.body;
 
-    if (!userName || !email || !otp)
+    if ((!userName && !email) || !otp)
       return res.status(400).json({
         success: false,
         code: -1,
@@ -113,7 +113,7 @@ exports.verifyOTP = async (req, res) => {
       });
 
     var users = await User.findOne({
-      $and: [{ userName: userName }, { email: email }],
+      $or: [{ userName: userName }, { email: email }],
     });
 
     if (!users)
@@ -189,7 +189,7 @@ exports.resendOTP = async (req, res) => {
   try {
     var { userName, email } = req.body;
 
-    if (!userName || !email)
+    if (!userName && !email)
       return res.status(400).json({
         success: false,
         code: -1,
@@ -197,7 +197,7 @@ exports.resendOTP = async (req, res) => {
       });
 
     var user = await User.findOne({
-      $and: [{ userName: userName }, { email: email }],
+      $or: [{ userName: userName }, { email: email }],
     });
 
     if (!user)
