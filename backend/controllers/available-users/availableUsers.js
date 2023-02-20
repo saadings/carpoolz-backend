@@ -5,10 +5,10 @@ var ActivePassenger = require("../../models/active-user/activePassengerModel");
 const validationError = require("../../utils/errorHandling/validationError");
 const serverError = require("../../utils/errorHandling/serverError");
 
-exports.activeDriver = async (req, res) => {
-  const { userName, origin, destination, route } = req.body;
+exports.availablePassengers = async (req, res) => {
+  const { userName } = req.body;
   try {
-    if (!userName || !origin || !destination || !route) {
+    if (!userName) {
       return res.status(400).json({
         success: false,
         code: -1,
@@ -42,19 +42,51 @@ exports.activeDriver = async (req, res) => {
       userID: driver._id,
     });
 
-    if (activeDriver)
+    if (!activeDriver)
       return res.status(400).json({
         success: false,
         code: -4,
-        message: "Driver already active.",
+        message: "Driver not active.",
       });
 
-    var newActiveDriver = new ActiveDriver({
-      userID: driver._id,
-      origin: origin,
-      destination: destination,
-      route: route,
+    var activePassengers = await ActivePassenger.find();
+
+    if (!activePassengers)
+      return res.status(400).json({
+        success: false,
+        code: -5,
+        message: "No active passengers.",
+      });
+
+    // for (let i = 0; i < activePassengers.length; i++) {
+    //   for (j < activePassengers[i].routes[0].legs[0].steps; j++) {
+
+    //   }
+
+    // }
+
+    activePassengers.map(({ route }) => {
+      route.legs.map(({ steps }) => {
+        steps.map(({ step }) => {
+          let polyline = step.polyline.encodedPolyline;
+        });
+      });
     });
+
+    activePassengers.map(({ route }) => {
+      route.legs.map(({ steps }) => {
+        steps.map(({ step }) => {
+          let polyline = step.polyline.encodedPolyline;
+        });
+      });
+    });
+
+    // var newActiveDriver = new ActiveDriver({
+    //   userID: driver._id,
+    //   origin: origin,
+    //   destination: destination,
+    //   route: route,
+    // });
 
     try {
       await newActiveDriver.save();

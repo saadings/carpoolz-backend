@@ -37,7 +37,7 @@ module.exports = function (otp, name) {
 <body>
   <div class="container">
     <div class="logo">
-      <img src="[company logo URL]" alt="Carpoolz">
+      <img src=${img} alt="Carpoolz"/>
     </div>
     <p class="header">Confirm Your Account Verification</p>
     <p>Dear ${name},</p>
