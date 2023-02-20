@@ -7,14 +7,14 @@ module.exports = function (otp, name) {
       font-family: Arial, sans-serif;
       font-size: 14px;
       line-height: 1.5;
-      background-color: #f8f9fa;
+      background-color: #e990ff;
       padding: 20px;
     }
     b {
-      color: #007bff;
+      color: #a600ce;
     }
     .container {
-      background-color: #fff;
+      background-color: #a600ce1f;
       border: 1px solid #dee2e6;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -27,6 +27,13 @@ module.exports = function (otp, name) {
     .logo img {
       width: 150px;
     }
+    .logo-tag {
+      margin-top: -18px;
+    }
+    .logo-tag img {
+      margin-top: -18px;
+      width: 150px;
+    }
     .header {
       font-size: 18px;
       font-weight: bold;
@@ -37,17 +44,21 @@ module.exports = function (otp, name) {
 <body>
   <div class="container">
     <div class="logo">
-      <img src=${img} alt="Carpoolz"/>
+      <img src="cid:image" alt="Carpoolz"/>
     </div>
     <p class="header">Confirm Your Account Verification</p>
-    <p>Dear ${name},</p>
-    <p>Thank you for choosing our service! To complete your account setup, we need you to confirm your email address.</p>
+    <p>Dear <strong>${name},</strong></p>
     <p>Please enter the following OTP (One Time Password) code in your account settings to verify your email address: <h1><b>${otp}</b></h1></p>
     <p>This OTP is valid for the next 10 minutes, so please enter it as soon as possible to avoid any delays in accessing your account.</p>
     <p>If you did not request this verification, please let us know immediately so we can secure your account.</p>
     <p>Thank you for your cooperation and enjoy our services!</p>
     <p>Best regards,</p>
-    <p>Team Carpoolz.</p>
+    <p>
+      <strong>Team Carpoolz.</strong>
+      <div class="logo-tag">
+        <img src="cid:image2" alt="Tag Line"/>
+      </div>
+    </p>
   </div>
 </body>
 </html>`;
