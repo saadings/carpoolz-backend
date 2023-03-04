@@ -2,8 +2,8 @@ var UserSession = require("../../models/user-session/userSessionModel");
 var User = require("../../models/users/userModel");
 var UserOTP = require("../../models/user-otp/userOTPModel");
 var sendOtp = require("../../utils/services/sendOTP");
-const validationError = require("../../utils/errorHandling/validationError");
-const serverError = require("../../utils/errorHandling/serverError");
+const validationError = require("../../utils/error-handling/validationError");
+const serverError = require("../../utils/error-handling/serverError");
 const {
   generateJWTToken,
   generateRefreshToken,

@@ -2,8 +2,11 @@ var User = require("../../models/users/userModel");
 var Driver = require("../../models/users/driverModel");
 var ActiveDriver = require("../../models/active-user/activeDriversModel");
 var ActivePassenger = require("../../models/active-user/activePassengerModel");
-const validationError = require("../../utils/errorHandling/validationError");
-const serverError = require("../../utils/errorHandling/serverError");
+const validationError = require("../../utils/error-handling/validationError");
+const serverError = require("../../utils/error-handling/serverError");
+const {
+  routeComparison,
+} = require("../../utils/route-comparison/routeComparison");
 
 exports.activeDriver = async (req, res) => {
   const { userName, origin, destination, route } = req.body;
@@ -50,7 +53,7 @@ exports.activeDriver = async (req, res) => {
       });
 
     var newActiveDriver = new ActiveDriver({
-      userID: driver._id,
+      userName: driver.userName,
       origin: origin,
       destination: destination,
       route: route,
@@ -62,10 +65,17 @@ exports.activeDriver = async (req, res) => {
       return res.status(500).json(validationError(error));
     }
 
+    let activePassengers = await ActivePassenger.find({});
+
+    let passengerList = routeComparison(
+      newActiveDriver.route,
+      activePassengers
+    );
+
     return res.status(201).json({
       success: true,
       code: 0,
-      message: "Driver activated successfully.",
+      message: `Driver activated successfully. + ${passengerList[0]}`,
     });
   } catch (error) {
     return res.status(500).json(serverError());
