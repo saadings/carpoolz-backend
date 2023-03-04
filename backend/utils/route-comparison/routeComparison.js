@@ -1,6 +1,5 @@
 exports.routeComparison = (route, routeList) => {
   activePassengers = [];
-
   driverSteps = {};
 
   for (let i = 0; i < route.legs.length; i++) {
@@ -10,17 +9,17 @@ exports.routeComparison = (route, routeList) => {
     }
   }
 
-  for (let i = 0; i < routeList.route.length; i++) {
+  for (let i = 0; i < routeList.length; i++) {
     let userName = routeList[i].userName;
-    if (
-      routeList[i].polyline.encodedPolyline == route.polyline.encodedPolyline
-    ) {
+    let route = routeList[i].route;
+
+    if (route.polyline.encodedPolyline == route.polyline.encodedPolyline) {
       activePassengers.push(userName);
       continue;
     }
 
     let distance = 0;
-    let legs = routeList[i].legs;
+    let legs = route.legs;
 
     for (let j = 0; j < legs.length; j++) {
       let steps = legs[j].steps;

@@ -18,7 +18,7 @@ exports.activeDriver = async (req, res) => {
         message: "Please provide all the required fields.",
       });
     }
-
+    // console.log(req.body);
     var user = await User.findOne({
       userName: userName,
     });
@@ -53,7 +53,7 @@ exports.activeDriver = async (req, res) => {
       });
 
     var newActiveDriver = new ActiveDriver({
-      userName: driver.userName,
+      userName: userName,
       origin: origin,
       destination: destination,
       route: route,
@@ -72,10 +72,18 @@ exports.activeDriver = async (req, res) => {
       activePassengers
     );
 
+    console.log(passengerList);
+
+    const io = req.app.locals.io;
+
+    passengerList.map((passenger) => {
+      io.emit(passenger, passengerList);
+    });
+
     return res.status(201).json({
       success: true,
       code: 0,
-      message: `Driver activated successfully. + ${passengerList[0]}`,
+      message: "Driver activated successfully.",
     });
   } catch (error) {
     return res.status(500).json(serverError());
