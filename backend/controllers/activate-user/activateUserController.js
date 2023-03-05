@@ -1,15 +1,16 @@
-var User = require("../../models/users/userModel");
-var Driver = require("../../models/users/driverModel");
-var ActiveDriver = require("../../models/active-user/activeDriversModel");
-var ActivePassenger = require("../../models/active-user/activePassengerModel");
+let User = require("../../models/users/userModel");
+let Driver = require("../../models/users/driverModel");
+let ActiveDriver = require("../../models/active-user/activeDriversModel");
+let ActivePassenger = require("../../models/active-user/activePassengerModel");
 const validationError = require("../../utils/error-handling/validationError");
 const serverError = require("../../utils/error-handling/serverError");
 const {
   routeComparison,
 } = require("../../utils/route-comparison/routeComparison");
 
-exports.activeDriver = async (req, res) => {
+exports.activateDriver = async (req, res) => {
   const { userName, origin, destination, route } = req.body;
+
   try {
     if (!userName || !origin || !destination || !route) {
       return res.status(400).json({
@@ -19,7 +20,7 @@ exports.activeDriver = async (req, res) => {
       });
     }
     // console.log(req.body);
-    var user = await User.findOne({
+    let user = await User.findOne({
       userName: userName,
     });
 
@@ -30,7 +31,7 @@ exports.activeDriver = async (req, res) => {
         message: "User not registered.",
       });
 
-    var driver = await Driver.findOne({
+    let driver = await Driver.findOne({
       userID: user._id,
     });
 
@@ -41,7 +42,7 @@ exports.activeDriver = async (req, res) => {
         message: "Driver not registered.",
       });
 
-    var activeDriver = await ActiveDriver.findOne({
+    let activeDriver = await ActiveDriver.findOne({
       userID: driver._id,
     });
 
@@ -52,7 +53,7 @@ exports.activeDriver = async (req, res) => {
         message: "Driver already active.",
       });
 
-    var newActiveDriver = new ActiveDriver({
+    let newActiveDriver = new ActiveDriver({
       userName: userName,
       origin: origin,
       destination: destination,
@@ -77,7 +78,11 @@ exports.activeDriver = async (req, res) => {
     const io = req.app.locals.io;
 
     passengerList.map((passenger) => {
-      io.emit(passenger, passengerList);
+      io.emit(passenger, {
+        userName: newActiveDriver.userName,
+        origin: newActiveDriver.origin,
+        destination: newActiveDriver.destination,
+      });
     });
 
     return res.status(201).json({
@@ -90,7 +95,7 @@ exports.activeDriver = async (req, res) => {
   }
 };
 
-exports.activePassenger = async (req, res) => {
+exports.activatePassenger = async (req, res) => {
   const { userName, origin, destination, route } = req.body;
   try {
     if (!userName || !origin || !destination || !route) {
@@ -101,7 +106,7 @@ exports.activePassenger = async (req, res) => {
       });
     }
 
-    var user = await User.findOne({
+    let user = await User.findOne({
       userName: userName,
     });
 
@@ -112,7 +117,7 @@ exports.activePassenger = async (req, res) => {
         message: "User not registered.",
       });
 
-    var activeP = await ActivePassenger.findOne({
+    let activeP = await ActivePassenger.findOne({
       userID: user._id,
     });
 
@@ -123,8 +128,8 @@ exports.activePassenger = async (req, res) => {
         message: "Passenger already active.",
       });
 
-    var newActivePassenger = new ActivePassenger({
-      userID: user._id,
+    let newActivePassenger = new ActivePassenger({
+      userName: userName,
       origin: origin,
       destination: destination,
       route: route,
@@ -136,10 +141,15 @@ exports.activePassenger = async (req, res) => {
       return res.status(500).json(validationError(error));
     }
 
+    let activeDrivers = await ActiveDriver.find({});
+
+    let driverList = routeComparison(newActivePassenger.route, activeDrivers);
+
     return res.status(201).json({
       success: true,
       code: 0,
       message: "Passenger activated successfully.",
+      data: driverList,
     });
   } catch (error) {
     return res.status(500).json(serverError());
