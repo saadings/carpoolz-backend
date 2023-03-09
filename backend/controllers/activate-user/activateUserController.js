@@ -43,7 +43,7 @@ exports.activateDriver = async (req, res) => {
       });
 
     let activeDriver = await ActiveDriver.findOne({
-      userID: driver._id,
+      userName: user.userName,
     });
 
     if (activeDriver)
