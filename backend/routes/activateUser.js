@@ -1,10 +1,10 @@
 var express = require("express");
 var router = express.Router();
 
-const userController = require("../controllers/users/userController");
-const { isJWTValid } = require("../middlewares/jwt/jwtMiddleware");
+const activeUserController = require("../controllers/activate-user/activateUserController");
+const { isJWTValid } = require("../middlewares/user-auth/userAuthMiddleware");
 
-router.post("/driver", isJWTValid);
-router.post("/passenger", isJWTValid);
+router.post("/driver", isJWTValid, activeUserController.activateDriver);
+router.post("/passenger", isJWTValid, activeUserController.activatePassenger);
 
 module.exports = router;

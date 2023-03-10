@@ -5,7 +5,7 @@ const userController = require("../controllers/users/userController");
 const {
   isJWTExpired,
   isJWTValid,
-} = require("../middlewares/jwt/jwtMiddleware");
+} = require("../middlewares/user-auth/userAuthMiddleware");
 /* GET users listing. */
 router.post("/register", userController.registerUser);
 router.post("/verify/otp", userController.verifyOTP);
