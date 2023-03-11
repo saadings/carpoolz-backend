@@ -390,30 +390,7 @@ exports.refreshToken = async (req, res) => {
   var { refreshToken } = req.body;
 
   try {
-    // if (!refreshToken)
-    //   return res.status(400).json({
-    //     success: false,
-    //     code: -1,
-    //     message: "Please provide all the required fields.",
-    //   });
-
-    // var userToken = await UserSession.findOne({ refreshToken: refreshToken });
-
-    // if (!userToken)
-    //   return res.status(400).json({
-    //     success: false,
-    //     code: -2,
-    //     message: "User not logged in.",
-    //   });
-
     var decodeRefreshToken = verifyRefreshToken(refreshToken);
-
-    // if (decodeRefreshToken.id !== userToken.userID.toString())
-    //   return res.status(400).json({
-    //     success: false,
-    //     code: -2,
-    //     message: "Invalid refresh token.",
-    //   });
 
     var accessToken = generateJWTToken({
       id: decodeRefreshToken.id,
