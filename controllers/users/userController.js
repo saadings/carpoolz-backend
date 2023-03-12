@@ -102,9 +102,8 @@ exports.registerUser = async (req, res) => {
 };
 
 exports.verifyOTP = async (req, res) => {
+  let { userName, otp } = req.body;
   try {
-    let { userName, otp } = req.body;
-
     if (!userName || !otp)
       return res.status(400).json({
         success: false,
