@@ -1,6 +1,6 @@
-var User = require("../../models/users/userModel");
-var Driver = require("../../models/users/driverModel");
-var Vehicle = require("../../models/vehicle/vehicleModel");
+let User = require("../../models/users/userModel");
+let Driver = require("../../models/users/driverModel");
+let Vehicle = require("../../models/vehicle/vehicleModel");
 
 exports.registerDriver = async (req, res) => {
   const { userName, cnic, licenseNo } = req.body;
@@ -13,7 +13,7 @@ exports.registerDriver = async (req, res) => {
       });
     }
 
-    var user = await User.findOne({
+    let user = await User.findOne({
       userName: userName,
     });
     if (!user)
@@ -23,7 +23,7 @@ exports.registerDriver = async (req, res) => {
         message: "User does not registered.",
       });
 
-    var driver = await Driver.findOne({
+    let driver = await Driver.findOne({
       userID: user._id,
     });
 
@@ -34,7 +34,7 @@ exports.registerDriver = async (req, res) => {
         message: "Driver already registered.",
       });
 
-    var newDriver = new Driver({
+    let newDriver = new Driver({
       userID: user._id,
       cnic: cnic,
       licenseNo: licenseNo,
@@ -82,7 +82,7 @@ exports.registerVehicle = async (req, res) => {
       });
     }
 
-    var user = await User.findOne({
+    let user = await User.findOne({
       userName: userName,
     });
     if (!user)
@@ -92,7 +92,7 @@ exports.registerVehicle = async (req, res) => {
         message: "User does not registered.",
       });
 
-    var driver = await Driver.findOne({
+    let driver = await Driver.findOne({
       userID: user._id,
     });
 
@@ -103,7 +103,7 @@ exports.registerVehicle = async (req, res) => {
         message: "Driver does not registered.",
       });
 
-    var vehicle = await Vehicle.findOne({
+    let vehicle = await Vehicle.findOne({
       vehicleNumber: vehicleNumber,
     });
 
@@ -114,7 +114,7 @@ exports.registerVehicle = async (req, res) => {
         message: "Vehicle already registered.",
       });
 
-    var newVehicle = new Vehicle({
+    let newVehicle = new Vehicle({
       driverID: driver._id,
       vehicleType: vehicleType,
       vehicleNumber: vehicleNumber,
@@ -149,7 +149,7 @@ exports.registerVehicle = async (req, res) => {
 //         message: "Please provide all the required fields.",
 //       });
 //     }
-//     var user = await User.findOne({
+//     let user = await User.findOne({
 //       userName: userName,
 //     });
 //     if (!user)
@@ -159,7 +159,7 @@ exports.registerVehicle = async (req, res) => {
 //         message: "User does not exist.",
 //       });
 
-//     var driver = await Driver.findOne({
+//     let driver = await Driver.findOne({
 //       userID: user._id,
 //     });
 

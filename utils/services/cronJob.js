@@ -1,6 +1,6 @@
-var cron = require("node-cron");
-var User = require("../../models/users/userModel");
-var UserOTP = require("../../models/user-otp/userOTPModel");
+let cron = require("node-cron");
+let User = require("../../models/users/userModel");
+let UserOTP = require("../../models/user-otp/userOTPModel");
 
 module.exports = cron.schedule("0 0 0 * * 1", async () => {
   console.log("Cron Running");

@@ -1,7 +1,7 @@
-var UserSession = require("../../models/user-session/userSessionModel");
-var User = require("../../models/users/userModel");
-var UserOTP = require("../../models/user-otp/userOTPModel");
-var sendOtp = require("../../utils/services/sendOTP");
+const UserSession = require("../../models/user-session/userSessionModel");
+const User = require("../../models/users/userModel");
+const UserOTP = require("../../models/user-otp/userOTPModel");
+const sendOtp = require("../../utils/services/sendOTP");
 const validationError = require("../../utils/error-handling/validationError");
 const serverError = require("../../utils/error-handling/serverError");
 const {
@@ -11,7 +11,7 @@ const {
 } = require("../../utils/services/jwt");
 
 exports.registerUser = async (req, res) => {
-  var {
+  let {
     userName,
     email,
     password,
@@ -38,7 +38,7 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    var alreadyExists = await User.findOne({
+    let alreadyExists = await User.findOne({
       $or: [{ userName: userName }, { email: email }],
     });
 
@@ -49,7 +49,7 @@ exports.registerUser = async (req, res) => {
         message: "User already exists.",
       });
 
-    var user = new User({
+    let user = new User({
       userName: userName,
       email: email,
       password: password,
@@ -68,10 +68,10 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json(validationError(error));
     }
 
-    var otp = Math.floor(100000 + Math.random() * 900000);
-    var expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
+    let otp = Math.floor(100000 + Math.random() * 900000);
+    let expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
 
-    var userOtp = new UserOTP({
+    let userOtp = new UserOTP({
       userID: user._id,
       otp: otp,
       expiryTime: expiryTime,
@@ -102,18 +102,17 @@ exports.registerUser = async (req, res) => {
 };
 
 exports.verifyOTP = async (req, res) => {
+  let { userName, otp } = req.body;
   try {
-    var { userName, email, otp } = req.body;
-
-    if ((!userName && !email) || !otp)
+    if (!userName || !otp)
       return res.status(400).json({
         success: false,
         code: -1,
         message: "Please provide all the required fields.",
       });
 
-    var users = await User.findOne({
-      $or: [{ userName: userName }, { email: email }],
+    let users = await User.findOne({
+      userName: userName,
     });
 
     if (!users)
@@ -130,7 +129,7 @@ exports.verifyOTP = async (req, res) => {
         message: "User already active.",
       });
 
-    var userOtp = await UserOTP.findOne({ userID: users._id });
+    let userOtp = await UserOTP.findOne({ userID: users._id });
     if (!userOtp)
       return res.status(400).json({
         success: false,
@@ -138,7 +137,7 @@ exports.verifyOTP = async (req, res) => {
         message: "User doesn't exists.",
       });
 
-    var compareOTP = await userOtp.compareOTP(otp);
+    let compareOTP = await userOtp.compareOTP(otp);
 
     if (compareOTP?.code < 0)
       return res.status(400).json({
@@ -148,12 +147,7 @@ exports.verifyOTP = async (req, res) => {
       });
 
     try {
-      await User.updateOne(
-        {
-          $and: [{ userName: userName }, { email: email }],
-        },
-        { $set: { active: true } }
-      );
+      await User.updateOne({ userName: userName }, { $set: { active: true } });
     } catch (error) {
       return res.status(400).json(validationError(error));
     }
@@ -162,7 +156,7 @@ exports.verifyOTP = async (req, res) => {
       await UserOTP.deleteOne({ userID: users._id });
     } catch (error) {
       if (error) {
-        var validationErrors = [];
+        let validationErrors = [];
         for (field in error.errors) {
           validationErrors.push(error.errors[field].message);
         }
@@ -187,17 +181,17 @@ exports.verifyOTP = async (req, res) => {
 
 exports.resendOTP = async (req, res) => {
   try {
-    var { userName, email } = req.body;
+    let { userName } = req.body;
 
-    if (!userName && !email)
+    if (!userName)
       return res.status(400).json({
         success: false,
         code: -1,
-        message: "Please provide all the required fields.",
+        message: "Please provide the username",
       });
 
-    var user = await User.findOne({
-      $or: [{ userName: userName }, { email: email }],
+    let user = await User.findOne({
+      userName: userName,
     });
 
     if (!user)
@@ -214,7 +208,7 @@ exports.resendOTP = async (req, res) => {
         message: "User already active.",
       });
 
-    var userOtp = await UserOTP.findOne({ userID: user._id });
+    let userOtp = await UserOTP.findOne({ userID: user._id });
     if (!userOtp)
       return res.status(400).json({
         success: false,
@@ -222,8 +216,8 @@ exports.resendOTP = async (req, res) => {
         message: "User doesn't exists.",
       });
 
-    var otp = Math.floor(100000 + Math.random() * 900000);
-    var expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
+    let otp = Math.floor(100000 + Math.random() * 900000);
+    let expiryTime = new Date(Date.now() + 10 * 60 * 1000); // expires after 10 minutes
 
     try {
       userOtp.otp = otp;
@@ -252,10 +246,10 @@ exports.resendOTP = async (req, res) => {
 };
 
 exports.loginUser = async (req, res) => {
-  var { userName, email, password } = req.body;
+  let { userName, password } = req.body;
 
   try {
-    if ((!userName && !email) || !password) {
+    if (!userName || !password) {
       return res.status(400).json({
         success: false,
         code: -1,
@@ -263,15 +257,15 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    var user = await User.findOne({
-      $or: [{ userName: userName }, { email: email }],
+    let user = await User.findOne({
+      userName: userName,
     });
 
     if (!user)
       return res.status(400).json({
         success: false,
         code: -2,
-        message: "Invalid username, email or password.",
+        message: "Invalid username or password.",
       });
 
     if (!user.active)
@@ -281,23 +275,23 @@ exports.loginUser = async (req, res) => {
         message: "User is not active",
       });
 
-    var validPassword = await user.comparePassword(password);
+    let validPassword = await user.comparePassword(password);
     if (!validPassword)
       return res.status(400).json({
         success: false,
         code: -2,
-        message: "Invalid username, email or password.",
+        message: "Invalid username or password.",
       });
 
-    var userLog = await UserSession.findOne({ userID: user._id });
+    let userLog = await UserSession.findOne({ userID: user._id });
 
-    var accessToken = generateJWTToken({
+    let accessToken = generateJWTToken({
       id: user._id,
       userName: user.userName,
       email: user.email,
     });
 
-    var refreshToken = generateRefreshToken({
+    let refreshToken = generateRefreshToken({
       id: user._id,
       userName: user.userName,
       email: user.email,
@@ -332,10 +326,10 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.logoutUser = async (req, res) => {
-  var { userName, email } = req.body;
+  let { userName } = req.body;
 
   try {
-    if (!userName && !email) {
+    if (!userName) {
       return res.status(400).json({
         success: false,
         code: -1,
@@ -343,15 +337,15 @@ exports.logoutUser = async (req, res) => {
       });
     }
 
-    var user = await User.findOne({
-      $or: [{ userName: userName }, { email: email }],
+    let user = await User.findOne({
+      userName: userName,
     });
 
     if (!user)
       return res.status(400).json({
         success: false,
         code: -2,
-        message: "Invalid username or email.",
+        message: "Invalid username",
       });
 
     if (!user.active)
@@ -361,7 +355,7 @@ exports.logoutUser = async (req, res) => {
         message: "User is not active",
       });
 
-    var userLog = await UserSession.findOne({ userID: user._id });
+    let userLog = await UserSession.findOne({ userID: user._id });
 
     if (!userLog)
       return res.status(400).json({
@@ -387,18 +381,18 @@ exports.logoutUser = async (req, res) => {
 };
 
 exports.refreshToken = async (req, res) => {
-  var { refreshToken } = req.body;
+  let { refreshToken } = req.body;
 
   try {
-    var decodeRefreshToken = verifyRefreshToken(refreshToken);
+    let decodeRefreshToken = verifyRefreshToken(refreshToken);
 
-    var accessToken = generateJWTToken({
+    let accessToken = generateJWTToken({
       id: decodeRefreshToken.id,
       userName: decodeRefreshToken.userName,
       email: decodeRefreshToken.email,
     });
 
-    var userLog = await UserSession.findOne({ refreshToken: refreshToken });
+    let userLog = await UserSession.findOne({ refreshToken: refreshToken });
 
     userLog.accessToken = accessToken;
 

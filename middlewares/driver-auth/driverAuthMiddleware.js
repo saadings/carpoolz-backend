@@ -4,7 +4,7 @@ const Driver = require("../../models/users/driverModel");
 exports.isDriver = async (req, res, next) => {
   const { userName } = req.body;
 
-  var user = await User.findOne({
+  let user = await User.findOne({
     userName: userName,
   });
 
@@ -15,7 +15,7 @@ exports.isDriver = async (req, res, next) => {
       message: "User not registered.",
     });
 
-  var driver = await Driver.findOne({
+  let driver = await Driver.findOne({
     userID: user._id,
   });
 
