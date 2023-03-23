@@ -1,3 +1,4 @@
+const Driver = require("../../models/users/driverModel");
 const UserSession = require("../../models/user-session/userSessionModel");
 const User = require("../../models/users/userModel");
 const UserOTP = require("../../models/user-otp/userOTPModel");
@@ -296,6 +297,15 @@ exports.loginUser = async (req, res) => {
       userName: user.userName,
       email: user.email,
     });
+    let types = [];
+
+    let driver = await Driver.findOne({
+      userID: user._id,
+    });
+
+    if (driver) {
+      types.push("Driver");
+    }
 
     if (!userLog)
       userLog = new UserSession({
@@ -328,6 +338,7 @@ exports.loginUser = async (req, res) => {
         gender: user.gender,
         rating: user.rating,
         active: user.active,
+        types: types,
       },
     });
   } catch (error) {
