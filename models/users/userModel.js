@@ -85,7 +85,7 @@ const UserSchema = new mongoose.Schema({
     },
   },
   rating: {
-    type: mongoose.Types.Decimal128,
+    type: Number,
     required: true,
     min: 0.0,
     max: 5.0,
