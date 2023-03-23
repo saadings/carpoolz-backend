@@ -319,6 +319,16 @@ exports.loginUser = async (req, res) => {
       message: "User logged in Successfully",
       accessToken,
       refreshToken,
+      data: {
+        userName: user.userName,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        contactNumber: user.contactNumber,
+        gender: user.gender,
+        rating: user.rating,
+        active: user.active,
+      },
     });
   } catch (error) {
     return res.status(500).json(serverError());
