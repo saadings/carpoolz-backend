@@ -118,8 +118,10 @@ exports.activatePassenger = async (req, res) => {
       });
 
     let activeP = await ActivePassenger.findOne({
-      userID: user._id,
+      userName: user.userName,
     });
+
+    console.log(activeP);
 
     if (activeP)
       return res.status(400).json({
