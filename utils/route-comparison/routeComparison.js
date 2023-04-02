@@ -13,7 +13,7 @@ exports.routeComparison = (route, routeList) => {
     let userName = routeList[i].userName;
     let route = routeList[i].route;
 
-    if (route.polyline.encodedPolyline == route.polyline.encodedPolyline) {
+    if (route.polyline.encodedPolyline === route.polyline.encodedPolyline) {
       activePassengers.push(userName);
       continue;
     }
