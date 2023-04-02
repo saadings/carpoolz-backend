@@ -11,15 +11,15 @@ exports.routeComparison = (route, routeList) => {
 
   for (let i = 0; i < routeList.length; i++) {
     let userName = routeList[i].userName;
-    let route = routeList[i].route;
+    let routeTwo = routeList[i].route;
 
-    if (route.polyline.encodedPolyline === route.polyline.encodedPolyline) {
+    if (route.polyline.encodedPolyline === routeTwo.polyline.encodedPolyline) {
       activePassengers.push(userName);
       continue;
     }
 
     let distance = 0;
-    let legs = route.legs;
+    let legs = routeTwo.legs;
 
     for (let j = 0; j < legs.length; j++) {
       let steps = legs[j].steps;
@@ -34,9 +34,9 @@ exports.routeComparison = (route, routeList) => {
       }
     }
 
-    if (distance > route.distanceMeters * 0.5) {
+    if (distance > routeTwo.distanceMeters * 0.5) {
       console.log("Distance: ", distance);
-      console.log("Actual Distance: ", route.distanceMeters);
+      console.log("Actual Distance: ", routeTwo.distanceMeters);
       activePassengers.push(userName);
     }
   }
