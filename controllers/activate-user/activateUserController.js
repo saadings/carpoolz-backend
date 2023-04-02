@@ -121,8 +121,6 @@ exports.activatePassenger = async (req, res) => {
       userName: user.userName,
     });
 
-    console.log(activeP);
-
     if (activeP)
       return res.status(400).json({
         success: false,
