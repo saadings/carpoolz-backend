@@ -145,11 +145,21 @@ exports.activatePassenger = async (req, res) => {
 
     let driverList = routeComparison(newActivePassenger.route, activeDrivers);
 
+    const driverDataList = activeDrivers.map((driver) => {
+      if (driverList.includes(driver.userName)) {
+        return {
+          userName: driver.userName,
+          origin: driver.origin,
+          destination: driver.destination,
+        };
+      }
+    });
+
     return res.status(201).json({
       success: true,
       code: 0,
       message: "Passenger activated successfully.",
-      data: driverList,
+      data: driverDataList,
     });
   } catch (error) {
     return res.status(500).json(serverError());
