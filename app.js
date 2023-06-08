@@ -8,6 +8,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var driverRouter = require("./routes/driver");
 var activeUserRouter = require("./routes/activateUser");
+var deActiveUserRouter = require("./routes/deActivateUser");
 var socketEmission = require("./routes/socketEmission");
 
 var app = express();
@@ -29,6 +30,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/drivers", driverRouter);
 app.use("/activate", activeUserRouter);
+app.use("/de-activate", deActiveUserRouter);
 app.use("/socket", socketEmission);
 
 // catch 404 and forward to error handler
