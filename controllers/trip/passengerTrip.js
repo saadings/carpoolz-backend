@@ -7,9 +7,9 @@ const UserModel = require("../../models/users/userModel");
 
 exports.startPassengerTrip = async (req, res) => {
   try {
-    const { userName, source, destination } = req.body;
+    const { userName } = req.body;
 
-    if (!userName || !source || !destination)
+    if (!userName)
       return res.status(400).json({
         success: false,
         code: -1,
@@ -28,8 +28,8 @@ exports.startPassengerTrip = async (req, res) => {
       });
 
     const trip = new InitiateRideModel({
-      source: source,
-      destination: destination,
+      source: user.origin,
+      destination: user.destination,
       rating: 0.0,
     });
 
