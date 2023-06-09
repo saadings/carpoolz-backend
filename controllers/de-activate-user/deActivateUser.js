@@ -1,3 +1,4 @@
+let serverError = require("../../utils/error-handling/serverError");
 let ActiveDriver = require("../../models/active-user/activeDriversModel");
 let ActivePassenger = require("../../models/active-user/activePassengerModel");
 

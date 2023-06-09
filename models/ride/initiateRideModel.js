@@ -1,23 +1,18 @@
+const { LocationSchema } = require("../location/locationSchema");
 const mongoose = require("mongoose");
 
 const InitiateRideSchema = new mongoose.Schema({
   source: {
-    type: String,
+    type: LocationSchema,
     required: true,
   },
   destination: {
-    type: String,
+    type: LocationSchema,
     required: true,
   },
-  longitude: {
-    type: mongoose.Types.Decimal128,
-  },
-  latitude: {
-    type: mongoose.Types.Decimal128,
-  },
-  timeElapsed: {
-    type: Data,
-  },
+  // timeElapsed: {
+  //   type: Date,
+  // },
   rating: {
     type: mongoose.Types.Decimal128,
   },

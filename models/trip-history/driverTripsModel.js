@@ -25,6 +25,10 @@ const DriverTripsSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  tripID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "InitiateRide",
+  },
   driverID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
