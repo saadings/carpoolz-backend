@@ -1,24 +1,24 @@
 const mongoose = require("mongoose");
 
 const PassengerTripsSchema = new mongoose.Schema({
-  source: {
-    type: String,
-    required: true,
-  },
-  destination: {
-    type: String,
-    required: true,
-  },
+  // source: {
+  //   type: String,
+  //   required: true,
+  // },
+  // destination: {
+  //   type: String,
+  //   required: true,
+  // },
   fare: {
     type: Number,
     required: true,
   },
-  duration: {
-    type: String,
-    required: true,
-  },
+  // duration: {
+  //   type: String,
+  //   required: true,
+  // },
   distance: {
-    type: String,
+    type: mongoose.Types.Decimal128,
     required: true,
   },
   tripID: {
