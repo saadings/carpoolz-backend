@@ -31,6 +31,7 @@ exports.startPassengerTrip = async (req, res) => {
       source: user.origin,
       destination: user.destination,
       rating: 0.0,
+      route: user.route,
     });
 
     try {

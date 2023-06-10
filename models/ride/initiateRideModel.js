@@ -10,6 +10,10 @@ const InitiateRideSchema = new mongoose.Schema({
     type: LocationSchema,
     required: true,
   },
+  route: {
+    type: {},
+    required: true,
+  },
   // timeElapsed: {
   //   type: Date,
   // },
