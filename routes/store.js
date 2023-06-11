@@ -11,5 +11,6 @@ const { isJWTValid } = require("../middlewares/user-auth/userAuthMiddleware");
 router.post("/all", isJWTValid, storeController.stores);
 router.post("/deals", isJWTValid, storeController.deals);
 router.post("/deals/add", isJWTValid, storeController.addDeals);
+router.post("/deals/all", isJWTValid, storeController.getDeals);
 // router.post("/register/store", isJWTValid, vendorController.registerStore);
 module.exports = router;

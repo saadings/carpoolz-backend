@@ -13,7 +13,7 @@ const DealsSchema = new mongoose.Schema({
     type: mongoose.Types.Decimal128,
     required: true,
   },
-  storeId: {
+  storeID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Store",
     required: true,

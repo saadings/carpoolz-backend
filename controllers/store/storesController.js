@@ -1,8 +1,6 @@
 let serverError = require("../../utils/error-handling/serverError");
 let validationError = require("../../utils/error-handling/validationError");
-
 let Store = require("../../models/store/storeModel");
-
 let Vendor = require("../../models/users/vendorModel");
 let User = require("../../models/users/userModel");
 let Deals = require("../../models/store/dealsModel");
@@ -57,9 +55,9 @@ exports.stores = async (req, res) => {
 
 exports.deals = async (req, res) => {
   try {
-    const { storeId } = req.body;
+    const { storeID } = req.body;
 
-    if (!storeId)
+    if (!storeID)
       return res.status(400).json({
         success: false,
         code: -1,
@@ -67,7 +65,7 @@ exports.deals = async (req, res) => {
       });
 
     let deals = await Deals.find({
-      storeId: storeId,
+      storeID: storeID,
     });
 
     return res.status(201).json({
@@ -83,9 +81,9 @@ exports.deals = async (req, res) => {
 
 exports.addDeals = async (req, res) => {
   try {
-    const { storeId, title, description, price } = req.body;
+    const { storeID, title, description, price } = req.body;
 
-    if (!storeId || !title || !description || !price)
+    if (!storeID || !title || !description || !price)
       return res.status(400).json({
         success: false,
         code: -1,
@@ -93,7 +91,7 @@ exports.addDeals = async (req, res) => {
       });
 
     let deals = new Deals({
-      storeId: storeId,
+      storeID: storeID,
       title: title,
       description: description,
       price: price,
@@ -109,6 +107,32 @@ exports.addDeals = async (req, res) => {
       success: true,
       code: 0,
       message: "Deal added successfully.",
+      // data: deals,
+    });
+  } catch (err) {
+    return res.status(500).json(serverError());
+  }
+};
+
+exports.getDeals = async (req, res) => {
+  try {
+    const { storeID } = req.body;
+
+    if (!storeID)
+      return res.status(400).json({
+        success: false,
+        code: -1,
+        message: "Please provide all the required fields.",
+      });
+
+    let deals = await Deals.find({
+      storeID: storeID,
+    });
+
+    return res.status(201).json({
+      success: true,
+      code: 0,
+      message: "Deals retrieved successfully.",
       data: deals,
     });
   } catch (err) {
