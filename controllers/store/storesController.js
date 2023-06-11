@@ -113,29 +113,3 @@ exports.addDeals = async (req, res) => {
     return res.status(500).json(serverError());
   }
 };
-
-exports.getDeals = async (req, res) => {
-  try {
-    const { storeID } = req.body;
-
-    if (!storeID)
-      return res.status(400).json({
-        success: false,
-        code: -1,
-        message: "Please provide all the required fields.",
-      });
-
-    let deals = await Deals.find({
-      storeID: storeID,
-    });
-
-    return res.status(201).json({
-      success: true,
-      code: 0,
-      message: "Deals retrieved successfully.",
-      data: deals,
-    });
-  } catch (err) {
-    return res.status(500).json(serverError());
-  }
-};
