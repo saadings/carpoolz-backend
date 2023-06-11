@@ -20,4 +20,4 @@ const DealsSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("DealsSchema", DealsSchema);
+module.exports = mongoose.model("Deals", DealsSchema);

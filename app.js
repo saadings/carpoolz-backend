@@ -13,6 +13,7 @@ var deActiveUserRouter = require("./routes/deActivateUser");
 var socketEmission = require("./routes/socketEmission");
 var passengerTrip = require("./routes/passengerTrip");
 var stores = require("./routes/store");
+var activateStores = require("./routes/activateStore");
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use("/users", usersRouter);
 app.use("/drivers", driverRouter);
 app.use("/vendors", vendorRouter);
 app.use("/stores", stores);
+app.use("/activate-store", activateStores);
 app.use("/activate", activeUserRouter);
 app.use("/de-activate", deActiveUserRouter);
 app.use("/socket", socketEmission);
