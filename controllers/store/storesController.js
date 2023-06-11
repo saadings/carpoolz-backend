@@ -39,7 +39,7 @@ exports.stores = async (req, res) => {
       });
 
     let stores = await Store.find({
-      vendorID: vendor._id,
+      vendorId: vendor._id,
     });
 
     return res.status(201).json({
