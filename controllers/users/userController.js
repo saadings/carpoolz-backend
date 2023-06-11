@@ -1,3 +1,4 @@
+const Vendor = require("../../models/users/vendorModel");
 const Driver = require("../../models/users/driverModel");
 const UserSession = require("../../models/user-session/userSessionModel");
 const User = require("../../models/users/userModel");
@@ -305,6 +306,14 @@ exports.loginUser = async (req, res) => {
 
     if (driver) {
       types.push("Driver");
+    }
+
+    let vendor = await Vendor.findOne({
+      userID: user._id,
+    });
+
+    if (vendor) {
+      types.push("Vendor");
     }
 
     if (!userLog)
